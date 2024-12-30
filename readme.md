@@ -52,7 +52,7 @@ See the documentation for more detailed usage examples.
 
 # Documentation
 
-Documentation can be found [here](https://github.com/still-standing88/SpeechCoreDocs).
+Documentation can be found [here](https://still-standing88.github.io/SpeechCoreDocs/).
 
 ## Library Notes
 
