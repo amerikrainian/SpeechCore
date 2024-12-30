@@ -52,7 +52,7 @@ See the documentation for more detailed usage examples.
 
 # Documentation
 
-Documentation can be found [here]().
+Documentation can be found [here](https://github.com/still-standing88/SpeechCoreDocs).
 
 ## Library Notes
 
@@ -68,7 +68,7 @@ Documentation can be found [here]().
 
 ## Bindings
 
-Wrappers are available for Python, .NET/C#, and Java.
+Bindings are available for Python, .NET/C#, and Java.
 
 Install python bindings via pip:
 ```bash
