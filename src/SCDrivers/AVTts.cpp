@@ -18,7 +18,7 @@ namespace utils {
 }
 
 AVTTSVoiceDriver::AVTTSVoiceDriver()
-    : ScreenReader(L"AVTTSVoice", SC_SPEECH_FLOW_CONTROL | SC_SPEECH_PARAMETER_CONTROL | SC_VOICE_CONFIG | SC_HAS_SPEECH),
+    : ScreenReader(L"AVTTSVoice", SC_SPEECH_FLOW_CONTROL | SC_SPEECH_PARAMETER_CONTROL | SC_VOICE_CONFIG | SC_HAS_SPEECH | SC_HAS_SPEECH_STATE),
       m_tts(nullptr) {
 }
 
