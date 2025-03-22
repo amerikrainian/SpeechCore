@@ -72,7 +72,7 @@ Bindings are available for Python, .NET/C#, and Java.
 
 Install python bindings via pip:
 ```bash
-pip install speech_core
+pip install SpeechCore
 ```
 available  via the [GitHub repo](https://github.com/still-standing88/Py-SpeechCore).
 

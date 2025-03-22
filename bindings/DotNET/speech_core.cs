@@ -11,6 +11,7 @@ public class SpeechCore
     public const uint SC_FILE_OUTPUT = 1 << 3;
     public const uint SC_HAS_SPEECH = 1 << 4;
     public const uint SC_HAS_BRAILLE = 1 << 5;
+    public const uint SC_HAS_SPEECH_STATE = 1 << 6;
 
     [DllImport(DllName)]
     private static extern void Speech_Init();
