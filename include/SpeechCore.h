@@ -45,15 +45,15 @@
 #define SC_HAS_BRAILLE (1<<5)
 
 #ifdef __cplusplus
+#include <cstdint>
+#endif // __cplusplus
+
+#ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
-#ifdef __cplusplus
-#include <cstdint>
-#else
 #include <stdint.h>
 #include <stdbool.h>
 #include <wchar.h>
-#endif // __cplusplus
 
 	/**
 	 * @brief Initializes the SpeechCore library. Must be called before using other functions.

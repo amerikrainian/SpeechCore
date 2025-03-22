@@ -98,12 +98,10 @@ const wchar_t* Sapi5Speech::get_voice_name(CComPtr<ISpObjectToken> _voice_token)
 }
 void Sapi5Speech::retreive_voice_tokens() {
     std::thread([&]() {
-        // Initialize COM pointers
         CComPtr<IEnumSpObjectTokens> token_enums;
         CComPtr<ISpObjectTokenCategory> token_category;
         unsigned long token_count = 0;
 
-        // Manually create an instance of ISpObjectTokenCategory
         HRESULT hr = CoCreateInstance(
             CLSID_SpObjectTokenCategory, 
             NULL, 
@@ -113,17 +111,14 @@ void Sapi5Speech::retreive_voice_tokens() {
         );
 
         if (SUCCEEDED(hr)) {
-            // Set category to SPCAT_VOICES
             hr = token_category->SetId(SPCAT_VOICES, FALSE);
             if (SUCCEEDED(hr)) {
-                // Enumerate tokens under the SPCAT_VOICES category
                 hr = token_category->EnumTokens(NULL, NULL, &token_enums);
                 if (SUCCEEDED(hr)) {
                     token_enums->GetCount(&token_count);
                     this->voice_tokens.clear();
                     this->voice_tokens.shrink_to_fit();
 
-                    // Loop through the tokens and add them to the vector
                     for (unsigned long i = 0; i < token_count; ++i) {
                         CComPtr<ISpObjectToken> voice_token;
                         token_enums->Item(i, &voice_token);
@@ -135,7 +130,6 @@ void Sapi5Speech::retreive_voice_tokens() {
             }
         }
 
-        // Clean up COM objects
         if (token_enums) {
             token_enums.Release();
         }
@@ -144,7 +138,7 @@ void Sapi5Speech::retreive_voice_tokens() {
             token_category.Release();
         }
 
-    }).detach();  // Run this process in a separate thread and detach it
+    }).detach();
 }
 
 void Sapi5Speech::processMessages() {

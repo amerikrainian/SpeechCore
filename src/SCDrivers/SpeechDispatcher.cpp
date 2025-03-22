@@ -1,5 +1,6 @@
+#include <cstdlib>
 #include "SpeechDispatcher.h"
-#ifdef __linux__ || __unix__
+#if defined(__linux__) || defined(__unix__)
 #include <dlfcn.h>
 #endif // __linux__ || __unix__
 

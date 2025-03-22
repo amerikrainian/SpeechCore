@@ -141,11 +141,12 @@ JNIEXPORT void JNICALL Java_SpeechCore_Speech_1Output_1File(JNIEnv* env, jobject
     JNIEXPORT void JNICALL Java_SpeechCore_Speech_1Pause(JNIEnv*, jobject) {
         Speech_Pause();
     }
+
+#ifdef _WIN32
     JNIEXPORT void JNICALL Java_SpeechCore_Speech_1Prefer_1Sapi(JNIEnv*, jobject, jboolean prefer_sapi) {
         Speech_Prefer_Sapi(static_cast<bool>(prefer_sapi));
     }
 
-#ifdef _WIN32
     JNIEXPORT jboolean JNICALL Java_SpeechCore_Speech_1Sapi_1Loaded(JNIEnv*, jobject) {
         return static_cast<jboolean>(Speech_Sapi_Loaded());
     }
