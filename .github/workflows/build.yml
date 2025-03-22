@@ -18,9 +18,8 @@ jobs:
         build_type: [release, debug]
         arch: [x86_64, arm64]
         exclude:
-          # Exclude arm64 builds on ubuntu-latest as it's typically x86_64
           - os: ubuntu-latest
-            arch: arm64
+            arch: arm64  # Ubuntu does not support arm64 in GitHub-hosted runners
 
     steps:
       - name: Checkout repository
@@ -37,14 +36,13 @@ jobs:
           java-version: '21'
           distribution: 'zulu'
 
-      # macOS-specific setup: Install Xcode Command Line Tools and SCons
-      - name: Install Xcode Command Line Tools (macOS)
+      # macOS-specific setup
+      - name: Install dependencies (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          sudo xcode-select --install || echo "Xcode Command Line Tools already installed"
-          brew install scons
+          brew install scons || echo "SCons already installed"
 
-      # Ubuntu-specific setup: Install GCC, Python, SCons, and Speech Dispatcher
+      # Ubuntu-specific setup
       - name: Install dependencies (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -54,23 +52,26 @@ jobs:
 
       # Java Specific checks
       - name: Check JAVA_HOME
-        run: echo $JAVA_HOME
+        run: echo "JAVA_HOME is set to $JAVA_HOME"
 
       - name: List Java Installation Directory
         run: |
-          ls -l $JAVA_HOME
-          ls -l $JAVA_HOME/lib
+          ls -l "$JAVA_HOME" || echo "JAVA_HOME not set"
+          ls -l "$JAVA_HOME/lib" || echo "Java lib directory not found"
 
-      # Build the project
-      - name: Build with SCons
+      # Build with SCons
+      - name: Build project
         run: |
           scons -Q build_mode=${{ matrix.build_mode }} build_type=${{ matrix.build_type }} arch=${{ matrix.arch }}
 
+      # Ensure build output exists before uploading
+      - name: Verify build artifacts
+        run: |
+          if [ ! -d "build" ]; then echo "Build directory not found!"; exit 1; fi
+
       # Upload build artifacts
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifacts-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.build_mode }}-${{ matrix.build_type }}
-          path: |
-            build/
-            lib/
+          path: lib/
