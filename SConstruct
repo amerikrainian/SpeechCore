@@ -190,7 +190,7 @@ elif compiler == 'clang':
 elif compiler == 'gcc':
     env.Replace(CC='gcc')
     env.Replace(CXX='g++')
-    env.Append(CXXFLAGS=['-std=c++20', '-Wall', '-Wextra', '-Wno-extern-initializer', '-Wno-unused-parameter'])
+    env.Append(CXXFLAGS=['-std=c++20', '-Wall', '-Wextra', '-Wno-unused-parameter'])
 else:
     env.Append(CXXFLAGS=['-std=c++20'])
 
@@ -262,8 +262,8 @@ if platform == 'windows':
 elif platform == 'macos':
     env.Append(CCFLAGS=['-arch', 'x86_64', '-arch', 'arm64'])
     env.Append(LINKFLAGS=['-arch', 'x86_64', '-arch', 'arm64'])
-    env.Append(CCFLAGS=['-mmacosx-version-min=10.13'])
-    #env.Append(LINKFLAGS=['-mmacosx-version-min=10.13'])
+    env.Append(CCFLAGS=['-mmacosx-version-min=10.14'])
+    #env.Append(LINKFLAGS=['-mmacosx-version-min= 10.14'])
 elif platform == 'linux':
     env.Append(CXXFLAGS=['-fPIC'])
     if target_arch == 'x86_64':
