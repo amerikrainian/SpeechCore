@@ -264,6 +264,7 @@ elif platform == 'macos':
     env.Append(LINKFLAGS=['-arch', 'x86_64', '-arch', 'arm64'])
     env.Append(CCFLAGS=['-mmacosx-version-min=10.14'])
     #env.Append(LINKFLAGS=['-mmacosx-version-min= 10.14'])
+
 elif platform == 'linux':
     env.Append(CXXFLAGS=['-fPIC'])
     if target_arch == 'x86_64':
@@ -287,8 +288,8 @@ src_files = []
 rc_files = [f'{src_dir}/SpeechCore.rc',]
 resource_files = []
 
-# Platform-specific exclusions. If any new screen readers specific to a platform end up being here this list has to be updated.
-windows_exclude = ['sapi5driver.cpp', 'SapiSpeech.cpp', 'nvda.cpp', 'jaws.cpp', 'sa.cpp', 'zdsr.cpp', 'zdsrapi.cpp', 'saapi.cpp', 'fsapi.c', 'wasapi.cpp']
+# Platform-specific exclusions. If any new screen readers specific to a platform end up being here, this list has to be updated.
+windows_exclude = ['sapi5driver.cpp', 'SapiSpeech.cpp', 'nvda.cpp', 'jaws.cpp', 'sa.cpp', 'pc_talker.cpp', 'zdsr.cpp', 'zdsrapi.cpp', 'saapi.cpp', 'fsapi.c', 'wasapi.cpp']
 exclude_files = {
     'windows': ['SpeechDispatcher.cpp', 'AVSpeech.mm', 'AVTts.cpp'],
     'macos': ['SpeechDispatcher.cpp', *windows_exclude],
@@ -308,6 +309,7 @@ for root, dirs, files in os.walk(src_dir):
 
 if java_support:
     src_files.append(os.path.join(build_dir, 'SpeechCore_JNI.cpp'))
+
 
 if platform == 'windows' and build_mode== 'shared':
     resource_files += [file.replace('.rc', '.res') for file in rc_files]
