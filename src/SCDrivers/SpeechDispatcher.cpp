@@ -35,7 +35,7 @@ void SpeechDispatcher::init() {
     if (spd_get_default_address && spd_open2) {
         const auto* address = spd_get_default_address(nullptr);
         if (address) {
-            speech_connection = spd_open2("SRAL", nullptr, nullptr, SPD_MODE_THREADED, address, true, nullptr);
+            speech_connection = spd_open2("SPEECH_C", nullptr, nullptr, SPD_MODE_THREADED, address, true, nullptr);
         }
     }
 }
@@ -56,15 +56,13 @@ bool SpeechDispatcher::is_running() {
 }
 
 bool SpeechDispatcher::is_speaking() {
-    // Speech Dispatcher doesn't provide a direct method to check if it's currently speaking
-    // You might need to implement a custom solution if this functionality is crucial
     return false;
 }
 
 bool SpeechDispatcher::speak_text(const wchar_t* text, bool interrupt) {
     if (!speech_connection) return false;
 
-    std::vector<char> utf8_text(wcslen(text) * 4 + 1);  // 4 bytes per character should be enough for UTF-8
+    std::vector<char> utf8_text(wcslen(text) * 4 + 1);
     wcstombs(utf8_text.data(), text, utf8_text.size());
 
     if (interrupt) {

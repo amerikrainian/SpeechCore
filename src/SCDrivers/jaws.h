@@ -14,13 +14,19 @@ private:
 	IJawsApi* module;
 	bool loaded;
 	bool Is_Active;
+
 public:
 	ScreenReaderJaws();
 	~ScreenReaderJaws();
+
 	void init() override;
 	void release() override;
 	bool is_speaking() override{ return false; }
 	bool is_running() override;
 	bool speak_text(const wchar_t* text,bool interrupt=false) override;
-	bool stop_speech();
+	bool output_braille(const wchar_t* text) override;
+	bool stop_speech() override;
+
+private:
+    bool run_jaws_function(const wchar_t* functionName);
 };

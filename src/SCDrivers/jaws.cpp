@@ -1,3 +1,4 @@
+#include <string>
 #include "jaws.h"
 
 bool fromVariant(VARIANT_BOOL VAR) {
@@ -5,7 +6,7 @@ bool fromVariant(VARIANT_BOOL VAR) {
 }
 
 ScreenReaderJaws::ScreenReaderJaws() :
-	ScreenReader(L"Jaws", SC_HAS_SPEECH),
+	ScreenReader(L"Jaws", SC_HAS_SPEECH | SC_HAS_BRAILLE),
 	module(nullptr),Is_Active(false) {
 
 }
@@ -27,6 +28,7 @@ ScreenReaderJaws::~ScreenReaderJaws() {
 }
 		}
 	}
+
 	void ScreenReaderJaws::release() {
 		this->loaded = false;
 		this->Is_Active = false;
@@ -38,6 +40,7 @@ ScreenReaderJaws::~ScreenReaderJaws() {
 			CoUninitialize();
 		}
 	}
+
 	bool ScreenReaderJaws::is_running() {
 		if (this->module != nullptr) {
 			VARIANT_BOOL bool_var;
@@ -47,6 +50,7 @@ ScreenReaderJaws::~ScreenReaderJaws() {
 		}
 		return false;
 	}
+
 	bool ScreenReaderJaws::speak_text(const wchar_t* text, bool interrupt) {
 		if (this->module != nullptr) {
 			bstr_t str = SysAllocString(text);
@@ -58,9 +62,47 @@ auto res = this->module->SayString(str,interrupt_speach,&bool_var);
 		}
 		return false;
 	}
+
+bool ScreenReaderJaws::output_braille(const wchar_t* text) {
+    if (this->module != nullptr && text != nullptr) {
+        
+        std::wstring wstr(text);        
+        std::wstring::size_type pos = wstr.find_first_of(L"\"");
+
+        while (pos != std::wstring::npos) {
+            wstr[pos] = L'\'';
+            pos = wstr.find_first_of(L"\"", pos + 1);
+        }
+        
+        wstr.insert(0, L"BrailleString(\"");
+        wstr.append(L"\")");
+        
+
+        bstr_t scriptCall = SysAllocString(wstr.c_str());
+        VARIANT_BOOL bool_var;
+        auto res = this->module->RunFunction(scriptCall, &bool_var);
+        SysFreeString(scriptCall);
+        
+        return (SUCCEEDED(res) && fromVariant(bool_var));
+    }
+    return false;
+}
+
 	bool ScreenReaderJaws::stop_speech() {
 		if (this->module != nullptr) {
 			return SUCCEEDED(this->module->StopSpeech());
 		}
 		return false;
+}
+
+
+bool ScreenReaderJaws::run_jaws_function(const wchar_t* functionName) {
+    if (this->module != nullptr && functionName != nullptr) {
+        bstr_t funcName = SysAllocString(functionName);
+        VARIANT_BOOL bool_var;
+        auto res = this->module->RunFunction(funcName, &bool_var);
+        SysFreeString(funcName);
+        return (SUCCEEDED(res) && fromVariant(bool_var));
+    }
+    return false;
 }

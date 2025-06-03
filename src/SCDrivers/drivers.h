@@ -2,6 +2,7 @@
 #ifdef _WIN32
 #include "jaws.h"
 #include "nvda.h"
+#include "pc_talker.h"
 #include "sa.h"
 #include "sapi5driver.h"
 #include "zdsr.h"
