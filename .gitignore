@@ -2,7 +2,6 @@ __pycash__/
 doxygen_output
 .sconf_temp/
 .vs/
-bin/
 build/
 dist/
 lib/
@@ -13,7 +12,6 @@ lib/
 *.obj
 *.o
 *.so
-*.dll
 *.exe
 *.pyd
 *.pyc

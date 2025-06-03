@@ -1,11 +1,14 @@
 #define __SPEECH_C_EXPORT
+
 #include <memory>
 #include <vector>
+
 #ifdef _WIN32
 #include <SDKDDKVer.h>
 #include <Windows.h>
 #include "./wrappers/SapiSpeech.h"
 #endif // _WIN32
+
 #include "../include/SpeechCore.h"
 #include "SCDrivers/drivers.h"
 #include "SCDrivers/SCDriver.h"
@@ -14,10 +17,12 @@ using namespace std;
 
 extern bool IS_LOADED = false;
 extern bool PREFER_SAPI = false;
+
 #ifdef _WIN32
 extern Sapi5Speech* sapi5 = nullptr;
 extern ScreenReaderSapi5* sapi5_driver = nullptr;
 #endif // _WIN32
+
 extern ScreenReader* current_driver = nullptr;
 vector<ScreenReader*> drivers;
 
@@ -25,12 +30,15 @@ vector<ScreenReader*> drivers;
 extern "C" SPEECH_C_API void Sapi_Init() {
 	sapi5 = new Sapi5Speech();
 }
+
 extern "C" SPEECH_C_API void Sapi_Release() {
 	if (sapi5 != nullptr) {
 		delete sapi5;
 		sapi5 = nullptr;
 	}
 }
+
+
 extern "C" SPEECH_C_API const wchar_t* Sapi_Get_Current_Voice() {
 	std::wstring str;
 	if (sapi5 != nullptr) {
@@ -38,62 +46,77 @@ extern "C" SPEECH_C_API const wchar_t* Sapi_Get_Current_Voice() {
 	}
 	return NULL;
 }
+
 extern "C" SPEECH_C_API const wchar_t* Sapi_Get_Voice(int index) {
 	if (sapi5 != nullptr) {
 		return sapi5->get_voice_by_index(index);
 	}
 	return NULL;
 }
+
 extern "C" SPEECH_C_API void Sapi_Set_Voice(const wchar_t* voice) {
 	if (sapi5 != nullptr) {
 		sapi5->set_voice(std::wstring(voice));
 	}
 }
+
 extern "C" SPEECH_C_API void Sapi_Set_Voice_By_Index(int index) {
 	if (sapi5 != nullptr) {
 		sapi5->set_voice_by_index(index);
 	}
 }
+
 extern "C" SPEECH_C_API int Sapi_Get_Voices() {
 	return (sapi5 != nullptr) ? sapi5->get_voices() : 0;
 }
+
+
 extern "C" SPEECH_C_API float Sapi_Voice_Get_Volume() {
 	return (sapi5 != nullptr) ? static_cast<float> (sapi5->get_volume()) : -1;
 }
+
 extern "C" SPEECH_C_API void Sapi_Voice_Set_Volume(float volume) {
 	if (sapi5 != nullptr) {
 		auto value = static_cast<USHORT>(volume);
 		sapi5->set_volume(value);
 	}
 }
+
 extern "C" SPEECH_C_API float Sapi_Voice_Get_Rate() {
 	return (sapi5 != nullptr) ? static_cast<float> (sapi5->get_rate()) : -1;
 }
+
 extern "C" SPEECH_C_API void Sapi_Voice_Set_Rate(float rate) {
 	if (sapi5 != nullptr) {
 		auto value = static_cast<long>(rate);
 		sapi5->set_rate(value);
 	}
 }
+
+
 extern "C" SPEECH_C_API void Sapi_Speak(const wchar_t* text, bool _interrupt, bool _xml) {
 	if (sapi5 != nullptr) {
 		sapi5->speak_text(text, _interrupt, _xml);
 	}
 }
+
 extern "C" SPEECH_C_API void Sapi_Output_File(const char* filename, const wchar_t* text, bool _xml) {
 	sapi5->speak_to_file(filename, text, _xml);
 }
+
 
 extern "C" SPEECH_C_API void Sapi_Pause() {
 	if (sapi5 != nullptr) {
 		sapi5->pause_speach();
 	}
 }
+
 extern "C" SPEECH_C_API void Sapi_Resume() {
 	if (sapi5 != nullptr) {
 		sapi5->resume_speach();
 	}
 }
+
 extern "C" SPEECH_C_API void Sapi_Stop() {
 	if (sapi5 != nullptr) {
 		sapi5->stop_speach();
@@ -101,20 +124,24 @@ extern "C" SPEECH_C_API void Sapi_Stop() {
 }
 #endif // _WIN32
 
+
 extern "C" SPEECH_C_API void Speech_Init() {
 #ifdef _WIN32
 	Sapi_Init();
 	ScreenReaderNVDA* nvda_driver(new ScreenReaderNVDA());
 	ScreenReaderJaws* jaws_driver(new ScreenReaderJaws());
+	ScreenReaderPCTalker pct_driver = new ScreenReaderPCTalker();
 	ScreenReaderSystemAccess* sa_driver(new ScreenReaderSystemAccess());
 	sapi5_driver = new ScreenReaderSapi5(sapi5);
 	ScreenReaderZhengdu* zdsr_driver(new ScreenReaderZhengdu());
 	nvda_driver->init();
 	jaws_driver->init();
+	pct_driver->init();
 	sa_driver->init();
 	zdsr_driver->init();
 	drivers.push_back(nvda_driver);
 	drivers.push_back(jaws_driver);
+	drivers.push_back(pct_driver);
 	//drivers.push_back(sapi5_driver);
 	drivers.push_back(sa_driver);
 	drivers.push_back(zdsr_driver);
@@ -132,6 +159,8 @@ extern "C" SPEECH_C_API void Speech_Init() {
 	Speech_Detect_Driver();
 	IS_LOADED = true;
 }
+
+
 extern "C" SPEECH_C_API void Speech_Free() {
 	if (!drivers.empty()) {
 		/*auto ittr_driver = drivers.begin();
@@ -145,6 +174,7 @@ extern "C" SPEECH_C_API void Speech_Free() {
 		drivers.shrink_to_fit();
 }
 }
+
 
 #ifdef _WIN32
 	//Sapi_Release();
@@ -237,15 +267,18 @@ extern "C" SPEECH_C_API int Speech_Get_Drivers() {
 extern "C" SPEECH_C_API bool Speech_Is_Loaded() {
 	return IS_LOADED;
 }
+
 extern "C" SPEECH_C_API bool Speech_Output(const wchar_t* text, bool _interrupt) {
 	if (current_driver == nullptr) {
 		Speech_Detect_Driver();
 	}
+
 	if (current_driver != nullptr && current_driver->is_running() && text) {
 		return current_driver->speak_text(text, _interrupt);
 	}
 	else {
 		Speech_Detect_Driver();
+
 		if (current_driver != nullptr && !current_driver->is_running() && text) {
 			return current_driver->speak_text(text, _interrupt);
 }
@@ -258,6 +291,7 @@ extern "C" SPEECH_C_API bool Speech_Braille(const wchar_t* text) {
 	if (current_driver == nullptr) {
 		Speech_Detect_Driver();
 	}
+
 	if (current_driver != nullptr && current_driver->is_running() && text) {
 		return (current_driver->get_speech_flags() & SC_HAS_BRAILLE) ? current_driver->output_braille(text) : false;
 	}
@@ -277,51 +311,67 @@ extern "C" SPEECH_C_API bool Speech_Stop() {
 	}
 	return false;
 }
+
+
 extern "C" SPEECH_C_API float Speech_Get_Volume() {
 	return (current_driver != nullptr) ? current_driver->get_volume() : -1;
 }
+
 extern "C" SPEECH_C_API void Speech_Set_Volume(float offset) {
 	if (current_driver != nullptr && offset >=0) {
 		current_driver->set_volume(offset);
 	}
 }
+
 extern "C" SPEECH_C_API float Speech_Get_Rate() {
 	return (current_driver != nullptr) ? current_driver->get_rate() : -1;
 }
+
 extern "C" SPEECH_C_API void Speech_Set_Rate(float offset) {
 	if (current_driver != nullptr && offset >=0 ) {
 		current_driver->set_rate(offset);
 	}
 }
+
+
 extern "C" SPEECH_C_API const wchar_t* Speech_Get_Current_Voice() {
 	return (current_driver != nullptr) ? current_driver->get_current_voice() : NULL;
 }
+
 extern "C" SPEECH_C_API const wchar_t* Speech_Get_Voice(int index) {
 	return (current_driver != nullptr && index >= 0) ? current_driver->get_voice(index) : NULL;
 }
+
 extern "C" SPEECH_C_API void Speech_Set_Voice(int index) {
 	if (current_driver != nullptr && index >= 0) {
 		current_driver->set_voice(index);
 	}
 }
+
 extern "C" SPEECH_C_API int Speech_Get_Voices() {
 	return (current_driver != nullptr) ? current_driver->get_voices() : 0;
 }
+
+
 extern "C" SPEECH_C_API void Speech_Output_File(const char* filePath, const wchar_t* text) {
 	if (current_driver != nullptr && filePath && text) {
 		current_driver->output_file(filePath, text);
 	}
 }
+
+
 extern "C" SPEECH_C_API void Speech_Resume() {
 	if (current_driver != nullptr) {
 		current_driver->resume_speech();
 	}
 }
+
 extern "C" SPEECH_C_API void Speech_Pause() {
 	if (current_driver != nullptr) {
 		current_driver->pause_speech();
 	}
 }
+
 extern "C" SPEECH_C_API uint32_t Speech_Get_Flags() {
 	return (current_driver != nullptr) ? current_driver->get_speech_flags() : 0;
 }
