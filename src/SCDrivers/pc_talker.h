@@ -1,5 +1,6 @@
 #pragma once
 #include <Windows.h>
+#include <string>
 #include "SCDriver.h"
 
 #ifdef _WIN64
@@ -26,9 +27,11 @@ private:
 public:
     ScreenReaderPCTalker();
     ~ScreenReaderPCTalker();
+
     void init() override;
     void release() override;
     bool is_running() override;
+	bool is_speaking() override { return false; }
     bool speak_text(const wchar_t* text, bool interrupt = false) override;
     bool stop_speech() override;
 

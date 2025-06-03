@@ -130,7 +130,7 @@ extern "C" SPEECH_C_API void Speech_Init() {
 	Sapi_Init();
 	ScreenReaderNVDA* nvda_driver(new ScreenReaderNVDA());
 	ScreenReaderJaws* jaws_driver(new ScreenReaderJaws());
-	ScreenReaderPCTalker pct_driver = new ScreenReaderPCTalker();
+	ScreenReaderPCTalker* pct_driver = new ScreenReaderPCTalker();
 	ScreenReaderSystemAccess* sa_driver(new ScreenReaderSystemAccess());
 	sapi5_driver = new ScreenReaderSapi5(sapi5);
 	ScreenReaderZhengdu* zdsr_driver(new ScreenReaderZhengdu());

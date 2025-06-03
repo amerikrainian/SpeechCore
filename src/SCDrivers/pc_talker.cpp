@@ -1,5 +1,5 @@
+
 #include "pc_talker.h"
-#include <string>
 
 ScreenReaderPCTalker::ScreenReaderPCTalker() :
     ScreenReader(L"PC Talker", SC_HAS_SPEECH | SC_HAS_SPEECH_STATE),
