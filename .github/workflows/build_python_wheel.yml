@@ -91,7 +91,7 @@ jobs:
           scons -j2 arch=x86_64 build_mode=static build_type=release build_python=1
 
       - name: Build Python wheel
-        run: python setup.py bdist_wheel
+        run: python setup.py sdist bdist_wheel
 
       - name: Stage wheel
         run: |
@@ -144,7 +144,7 @@ jobs:
           scons -j$CORES arch=${{ matrix.arch }} build_mode=static build_type=release build_python=1
 
       - name: Build Python wheel
-        run: python setup.py bdist_wheel
+        run: python setup.py sdist bdist_wheel
 
       - name: Stage wheel
         run: |
