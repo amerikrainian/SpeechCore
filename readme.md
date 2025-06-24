@@ -72,14 +72,22 @@ Bindings are available for Python, .NET/C#, and Java.
 
 Install python bindings via pip:
 ```bash
-pip install SpeechCore
+pip install speech_core
 ```
-available  via the [GitHub repo](https://github.com/still-standing88/Py-SpeechCore).
 
 
 ## Credits
 
 This library was inspired by [Tolk](https://github.com/dkager/tolk/), with adaptations for more flexibility. It was initially developed for personal projects and later expanded to be cross-platform.
+
+## Change Log
+
+### Version 1.0.2
+* Added PCTalker screen reader support.
+* Implemented braille functionality for screen readers that support it (NVDA, jaws)
+* Modified Encoding handling for Unix platforms, it should function properly now.
+* Python bindings have been rewritten with pybind11 an is now a a part of the main repo.
+* Dotnet bindings are now available as a nuget package.
 
 ## Contributions
 
