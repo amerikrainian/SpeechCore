@@ -9,7 +9,6 @@ public class SpeechCore implements AutoCloseable {
     public static final int SC_FILE_OUTPUT = 1 << 3;
     public static final int SC_HAS_SPEECH = 1 << 4;
     public static final int SC_HAS_BRAILLE = 1 << 5;
-    public static final int SC_HAS_SPEECH_STATE = 1 << 6;
 
     private native void Speech_Init();
     private native void Speech_Free();
