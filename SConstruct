@@ -1,14 +1,38 @@
-# SConstruct file for building SpeechCore
-# Some paths here for Linux/macos have bin edited for GitHub actions use
+# SConstruct file for building SpeechCore.
+# Some paths here for Linux/macos have bin edited for GitHub actions use.
+# Compilers for platform by default are:
+# MSVC on Windows, GCC on Linux, and Clang on Mac.
+# It is recommended to use the compilers for each platform as specified above.
+
 
 import platform as pf
 import os
 import sys
 import shutil
+
 from SCons.Script import Environment, DefaultEnvironment, Import, Exit
 from SCons.Script import Variables, BoolVariable, EnumVariable, ARGUMENTS
 
 # Functions for handling build process.
+
+def build_python_wheel(target, source, env):
+    global platform, target_arch, build_type    
+
+    print("Building Python wheel...")
+    os.environ['PYTHON_BUILD_TYPE'] = build_type    
+
+    try:
+        cmd = f"{sys.executable} setup.py bdist_wheel"
+        result = os.system(cmd)
+        if result != 0:
+            print("ERROR: Python wheel build failed")
+            return 1
+        
+        print("Python wheel built successfully")
+        return 0
+    except Exception as e:
+        print(f"ERROR building Python wheel: {str(e)}")
+        return 1
 
 def handle_java(env):
     env.Append(CPPDEFINES=['__WITH_JAVA'])
@@ -57,6 +81,7 @@ def detect_host_arch():
     else:
         print(f"Warning: Unrecognized architecture '{machine}'. Defaulting to x86_64.")
         return 'x86_64'
+
 
 def detect_compiler(env):
     compiler = env.get('compiler', 'default')
@@ -155,9 +180,22 @@ vars.Add(BoolVariable(
     False
 ))
 
-env = Environment(variables=vars)
-vars.Update(env)
+vars.Add(BoolVariable(
+    'build_python',
+    'Build Python wheel package',
+    False
+))
+
 res_file = None
+_cli_arch = ARGUMENTS.get('arch', host_arch)
+_msvc_arch = None
+
+if sys.platform.startswith('win'):
+    if _cli_arch== 'x86': _msvc_arch = 'x86'
+    elif _cli_arch== 'x86_64': _msvc_arch = 'amd64'
+env = Environment(variables=vars, TARGET_ARCH=_msvc_arch if _msvc_arch else None)
+
+vars.Update(env)
 
 
 # Main script starts here
@@ -166,6 +204,7 @@ target_arch = env.get('arch')
 compiler = detect_compiler(env)
 java_support = env.get('with_java', True)
 cleanup = env.get('cleanup', False)
+build_python = env.get('build_python', False)
 java_home = ""
 
 print("Detected platform: {}".format(platform))
@@ -198,14 +237,14 @@ else:
 build_type = env.get('build_type', 'release')
 if build_type == 'debug':
     if compiler == 'msvc':
-        env.Append(CCFLAGS=['/Zi'])
+        env.Append(CCFLAGS=['/Zi', '/MTd'])
         env.Append(LINKFLAGS=['/DEBUG'])
     else:
         env.Append(CXXFLAGS=['-g'])
-    env.Append(CCFLAGS=['-DDEBUG'])
+    env.Append(CCFLAGS=['-DDEBUG', ])
 else:
     if compiler == 'msvc':
-        env.Append(CCFLAGS=['/O2'])
+        env.Append(CCFLAGS=['/O2', '/MT'])
     else:
         env.Append(CXXFLAGS=['-O2'])
     env.Append(CCFLAGS=['-DNDEBUG'])
@@ -315,15 +354,24 @@ if platform == 'windows' and build_mode== 'shared':
     resource_files += [file.replace('.rc', '.res') for file in rc_files]
 
 env.VariantDir(build_dir, src_dir, duplicate=0)
-
-
 compile_rc()
+
+
 # Build the library
 if build_mode == 'static':
     lib = env.StaticLibrary(os.path.join(lib_dir, 'SpeechCore'), src_files)
 else:
     lib = env.SharedLibrary(os.path.join(lib_dir, 'SpeechCore'), src_files+resource_files)
 env.AddPostAction(lib, build_cleanup)
+
+# Build python package
+if build_python:
+    if build_mode != 'static':
+        print("WARNING: Python wheel build requires static library. Skipping python package build.")
+    else:
+        python_wheel = env.Command('python_wheel_built', lib, build_python_wheel)
+        env.Depends(python_wheel, lib)
+
 
 # Set correct library prefix and suffix based on platform
 if platform == 'windows':
@@ -335,5 +383,7 @@ elif platform == 'linux':
     env.Replace(SHLIBPREFIX='lib')
     env.Replace(SHLIBSUFFIX='.so')
 
-
-Default(lib)
+if build_python:
+    Default([lib, python_wheel])
+else:
+    Default(lib)
