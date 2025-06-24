@@ -3,7 +3,7 @@
 ScreenReaderNVDA* ScreenReaderNVDA::currentInstance = nullptr;
 
 ScreenReaderNVDA::ScreenReaderNVDA() :
-	ScreenReader(L"NVDA", SC_HAS_SPEECH | SC_HAS_SPEECH_STATE), module(NULL),
+	ScreenReader(L"NVDA", SC_HAS_SPEECH | SC_HAS_SPEECH_STATE | SC_HAS_BRAILLE), module(NULL),
 nvdaController_testIfRunning_fn(NULL),
 nvdaController_speakText_fn(NULL),
 nvdaController_brailleMessage_fn(NULL),
