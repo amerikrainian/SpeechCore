@@ -14,7 +14,7 @@ from wheel.bdist_wheel import bdist_wheel
 
 def get_readme():
     try:
-        with open("./readme.md", 'r', encoding='utf-8') as file:
+        with open("./python_readme.md", 'r', encoding='utf-8') as file:
             return file.read()
     except FileNotFoundError:
         return "SpeechCore Python Wrapper (pybind11)"
