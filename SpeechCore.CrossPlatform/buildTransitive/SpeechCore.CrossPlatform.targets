@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'win-x86' OR ('$(RuntimeIdentifier)' == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true' AND '$([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture)' == 'X86')">
+    <NativeLibs Include="$(MSBuildThisFileDirectory)..\runtimes\win-x86\native\*.dll" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'win-x64' OR ('$(RuntimeIdentifier)' == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true' AND '$([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture)' == 'X64')">
+    <NativeLibs Include="$(MSBuildThisFileDirectory)..\runtimes\win-x64\native\*.dll" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'linux-x64' OR ('$(RuntimeIdentifier)' == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true')">
+
+    <NativeLibs Include="$(MSBuildThisFileDirectory)..\runtimes\linux-x64\native\libSpeechCore.so" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'osx-x64' OR ('$(RuntimeIdentifier)' == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true' AND '$([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture)' == 'X64')">
+    <NativeLibs Include="$(MSBuildThisFileDirectory)..\runtimes\osx-x64\native\libSpeechCore.dylib" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'osx-arm64' OR ('$(RuntimeIdentifier)' == '' AND '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true' AND '$([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture)' == 'Arm64')">
+    <NativeLibs Include="$(MSBuildThisFileDirectory)..\runtimes\osx-arm64\native\libSpeechCore.dylib" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'linux-arm64'">
+    <NativeLibs Include="$(MSBuildThisFileDirectory)..\runtimes\linux-arm64\native\libSpeechCore.so" />
+  </ItemGroup>
+
+  <Target Name="CopySpeechCoreNativeLibs" BeforeTargets="Build">
+    <Copy SourceFiles="@(NativeLibs)" 
+          DestinationFolder="$(OutputPath)" 
+          SkipUnchangedFiles="true" 
+          Condition="Exists('%(NativeLibs.Identity)')" />
+  </Target>
+
+  <Target Name="CopySpeechCoreNativeLibsOnPublish" BeforeTargets="Publish">
+    <Copy SourceFiles="@(NativeLibs)" 
+          DestinationFolder="$(PublishDir)" 
+          SkipUnchangedFiles="true" 
+          Condition="Exists('%(NativeLibs.Identity)')" />
+  </Target>
+
+</Project>
