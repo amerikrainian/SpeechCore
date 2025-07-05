@@ -114,3 +114,68 @@ add_library(SpeechCore::SpeechCore ALIAS SpeechCore)
 
 # Set folder for Visual Studio
 set_target_properties(SpeechCore PROPERTIES FOLDER "3rdparty")
+
+# Copy Windows DLLs to output directory
+if(WIN32)
+    # Determine architecture
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(SPEECHCORE_ARCH "x64")
+        set(SPEECHCORE_DLL_SUFFIX "64")
+    else()
+        set(SPEECHCORE_ARCH "x86")
+        set(SPEECHCORE_DLL_SUFFIX "32")
+    endif()
+    
+    # List of DLLs to copy
+    set(SPEECHCORE_DLLS
+        "${CMAKE_CURRENT_SOURCE_DIR}/bin/${SPEECHCORE_ARCH}/nvdaControllerClient${SPEECHCORE_DLL_SUFFIX}.dll"
+        "${CMAKE_CURRENT_SOURCE_DIR}/bin/${SPEECHCORE_ARCH}/SAAPI${SPEECHCORE_DLL_SUFFIX}.dll"
+        "${CMAKE_CURRENT_SOURCE_DIR}/bin/${SPEECHCORE_ARCH}/jfwapi${SPEECHCORE_DLL_SUFFIX}.dll"
+    )
+    
+    # Additional DLLs with different naming patterns
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        list(APPEND SPEECHCORE_DLLS
+            "${CMAKE_CURRENT_SOURCE_DIR}/bin/${SPEECHCORE_ARCH}/PCTKUSR64.dll"
+            "${CMAKE_CURRENT_SOURCE_DIR}/bin/${SPEECHCORE_ARCH}/ZDSRAPI_x64.dll"
+        )
+    else()
+        list(APPEND SPEECHCORE_DLLS
+            "${CMAKE_CURRENT_SOURCE_DIR}/bin/${SPEECHCORE_ARCH}/PCTKUSR.dll"
+            "${CMAKE_CURRENT_SOURCE_DIR}/bin/${SPEECHCORE_ARCH}/ZDSRAPI32.dll"
+        )
+    endif()
+    
+    # Copy DLLs to the output directory for each configuration
+    foreach(dll ${SPEECHCORE_DLLS})
+        if(EXISTS ${dll})
+            get_filename_component(dll_name ${dll} NAME)
+            
+            # For multi-config generators (Visual Studio)
+            if(CMAKE_CONFIGURATION_TYPES)
+                foreach(config ${CMAKE_CONFIGURATION_TYPES})
+                    file(COPY ${dll} DESTINATION "${CMAKE_BINARY_DIR}/bin/${config}")
+                endforeach()
+            else()
+                # For single-config generators
+                file(COPY ${dll} DESTINATION "${CMAKE_BINARY_DIR}/bin")
+            endif()
+            
+            # Also install the DLLs
+            install(FILES ${dll} DESTINATION ${BIN_DIR})
+        endif()
+    endforeach()
+    
+    if(TARGET vcmiclient)
+        foreach(dll ${SPEECHCORE_DLLS})
+            if(EXISTS ${dll})
+                get_filename_component(dll_name ${dll} NAME)
+                add_custom_command(TARGET vcmiclient POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${dll}"
+                    "$<TARGET_FILE_DIR:vcmiclient>/${dll_name}"
+                )
+            endif()
+        endforeach()
+    endif()
+endif()
