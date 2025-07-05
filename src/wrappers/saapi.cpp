@@ -15,7 +15,7 @@ static SA_IsRunning sa_IsRunning = NULL;
 
 bool sa_initialize() {
 #ifdef _WIN64
-    controller = LoadLibrary(L"SAAPI64.dll");
+    controller = LoadLibraryW(L"SAAPI64.dll");
 #else
     controller = LoadLibrary(L"SAAPI32.dll");
 #endif

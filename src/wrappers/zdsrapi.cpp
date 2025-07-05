@@ -7,7 +7,7 @@ ZDSRAPI::~ZDSRAPI() {
 }
 
 bool ZDSRAPI::loadLibrary(const wchar_t* dllName) {
-    hDll = LoadLibrary(dllName);
+    hDll = LoadLibraryW(dllName);
     if (!hDll) {
         return false;
     }

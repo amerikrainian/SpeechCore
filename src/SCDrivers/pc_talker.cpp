@@ -18,7 +18,7 @@ ScreenReaderPCTalker::~ScreenReaderPCTalker() {
 
 void ScreenReaderPCTalker::init() {
     if (!this->loaded) {
-        this->module = LoadLibrary(PCTALKER_MODULE);
+        this->module = LoadLibraryW(PCTALKER_MODULE);
         if (this->module) {
             pctk_status_fn = (PCTKStatus_t)GetProcAddress(this->module, "PCTKStatus");
             pctk_read_fn = (PCTKPRead_t)GetProcAddress(this->module, "PCTKPRead");
